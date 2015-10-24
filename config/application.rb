@@ -6,14 +6,15 @@ require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "action_view/railtie"
-require "sprockets/railtie"
+# require "sprockets/railtie"
 Bundler.require(*Rails.groups)
 module Xlym
   class Application < Rails::Application
     config.i18n.enforce_available_locales = true
-    config.quiet_assets = true
+
     config.generators do |generate|
       generate.helper false
+      generate.template_engine false
       generate.javascript_engine false
       generate.request_specs false
       generate.routing_specs false
@@ -24,5 +25,13 @@ module Xlym
     config.action_controller.action_on_unpermitted_parameters = :raise
     config.active_record.raise_in_transactional_callbacks = true
     config.active_job.queue_adapter = :delayed_job
+
+    config.middleware.insert_before 0, "Rack::Cors" do
+      allow do
+        origins '*'
+        resource '*', :headers => :any, :methods => [:get, :post, :put, :patch, :delete, :options, :head]
+      end
+    end
+
   end
 end
